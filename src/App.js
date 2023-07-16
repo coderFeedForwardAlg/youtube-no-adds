@@ -2,9 +2,47 @@ import './App.css';
 import { useState } from "react";
 // const axios = require('axios');
 import axios from 'axios' 
+// Use this code snippet in your app.
+// If you need more information about configurations or implementing the sample code, visit the AWS docs:
+// https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/getting-started.html
+
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
 
 
 function App() {
+  // for secrets 
+  
+  const secret_name = "videos-key";
+
+  const client = new SecretsManagerClient({
+    region: "us-east-2",
+  });
+
+  let response;
+  const getSecret = async () =>{
+    try {
+      response = await client.send(
+        new GetSecretValueCommand({
+          SecretId: secret_name,
+          VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+        })
+      );
+    } catch (error) {
+      // For a list of exceptions thrown, see
+      // https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+      throw error;
+    }
+  }
+  getSecret();
+  
+
+  const secret = response.SecretString;
+
+
+
   const [search, setSearch] = useState("");
   const [video, setVideo] = useState(<></>);
 
@@ -26,7 +64,7 @@ function App() {
       },
       headers: {
         //TODO: hide api key !!!! 
-        'X-RapidAPI-Key': process.env.REACT_APP_VIDEOS_API_KEY,
+        'X-RapidAPI-Key': secret,
         'X-RapidAPI-Host': 'youtube-v31.p.rapidapi.com'
       }
     };
