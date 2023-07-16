@@ -24,7 +24,7 @@ function App() {
   let response;
   const getSecret = async () =>{
     try {
-      response = await client.send(
+      return await client.send(
         new GetSecretValueCommand({
           SecretId: secret_name,
           VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
@@ -36,10 +36,12 @@ function App() {
       throw error;
     }
   }
-  getSecret();
+  let secret;
+  response = getSecret();
   
-
-  const secret = response.SecretString;
+  secret = response.SecretString;
+  
+  
 
 
 
